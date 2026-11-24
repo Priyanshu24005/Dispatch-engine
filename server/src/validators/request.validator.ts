@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export const validateCreateRequest = [
   body("pickupLat").isFloat({ min: -90, max: 90 }).toFloat().withMessage("pickupLat must be between -90 and 90"),
@@ -9,3 +9,5 @@ export const validateCreateRequest = [
   body("receiverPhone").isString().matches(/^\d{10}$/).withMessage("receiverPhone must be 10 digits"),
   body("priority").optional().isIn(["normal", "urgent"]).withMessage("priority must be normal or urgent"),
 ];
+
+export const validateRequestId = [param("id").isMongoId().withMessage("invalid request id")];
