@@ -19,5 +19,8 @@ const requestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Makes the "how many jobs does this rider have" query fast
+requestSchema.index({ assignedRiderId: 1, status: 1 });
+
 // Named DispatchRequest because "Request" is already a built-in name in Node
 export const DispatchRequest = mongoose.model("DispatchRequest", requestSchema);

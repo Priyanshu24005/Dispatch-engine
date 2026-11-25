@@ -18,7 +18,6 @@ export async function getRequest(requestId: string) {
   return DispatchRequest.findById(requestId);
 }
 
-
 // Returns null if the move is not allowed or the status changed in between
 export async function changeStatus(requestId: string, from: string, to: string) {
   if (!canMove(from, to)) return null;
@@ -28,4 +27,13 @@ export async function changeStatus(requestId: string, from: string, to: string) 
 
   const updated = await DispatchRequest.findOneAndUpdate(filter, update, { new: true });
   return updated;
+}
+
+// Offered, accepted and in-progress jobs all count as busy
+export async function getRiderJobCount(riderId: string) {
+  const count = await DispatchRequest.countDocuments({
+    assignedRiderId: riderId,
+    status: { $in: ["OFFERED", "ACCEPTED", "IN_PROGRESS"] },
+  });
+  return count;
 }
