@@ -19,13 +19,19 @@ export async function getRequest(requestId: string) {
 }
 
 // Returns null if the move is not allowed or the status changed in between
-export async function changeStatus(requestId: string, from: string, to: string) {
+export async function changeStatus(
+  requestId: string,
+  from: string,
+  to: string,
+) {
   if (!canMove(from, to)) return null;
 
   const filter: any = { _id: requestId, status: from };
   const update: any = { status: to };
 
-  const updated = await DispatchRequest.findOneAndUpdate(filter, update, { new: true });
+  const updated = await DispatchRequest.findOneAndUpdate(filter, update, {
+    returnDocument: "after",
+  });
   return updated;
 }
 
@@ -36,4 +42,17 @@ export async function getRiderJobCount(riderId: string) {
     status: { $in: ["OFFERED", "ACCEPTED", "IN_PROGRESS"] },
   });
   return count;
+}
+
+// Takes the oldest waiting request and moves it to SEARCHING.
+// Sorting priority high to low puts "urgent" before "normal" (u comes after n).
+export async function claimNextRequest() {
+  const filter: any = { status: "CREATED" };
+  const update: any = { status: "SEARCHING" };
+
+    const claimed = await DispatchRequest.findOneAndUpdate(filter, update, {
+    returnDocument: "after",
+    sort: { priority: -1, createdAt: 1 },
+  });
+  return claimed;
 }

@@ -4,10 +4,12 @@ import { env } from "./config/env.js";
 import { connectMongo } from "./config/mongo.js";
 import { attachWebSocket } from "./websocket/server.js";
 import { startHeartbeatSweeper } from "./services/heartbeat.service.js";
+import { startDispatchLoop } from "./services/dispatch.service.js";
 
 await connectMongo();
 
 startHeartbeatSweeper();
+startDispatchLoop();
 
 const server = createServer(app);
 attachWebSocket(server);
